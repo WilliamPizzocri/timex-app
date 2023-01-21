@@ -1,10 +1,28 @@
-import { SafeAreaView, StyleSheet, Text, View } from 'react-native'
-import React from 'react';
+import { KeyboardAvoidingView, SafeAreaView, StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React, { useState } from 'react';
 import Svg, { Circle, Path } from 'react-native-svg';
+import { AntDesign, Feather  } from '@expo/vector-icons';
 import { styles } from '../style';
 import Btn from '../components/Btn';
+import Field from '../components/Field';
 
 export default LandingPage = () => {
+  const [email, setEmail] = useState(null);
+  const [password, setPassword] = useState(null);
+  const [emailColorState, setEmailColorState] = useState('rgba(0, 0, 0, 0.3)');
+  const [passwordColorState, setPasswordColorState] = useState('rgba(0, 0, 0, 0.3)');
+  const [passwordVisibility, setPasswordVisibility] = useState('eye-off');
+
+  const handleMailChange = text => {
+    setEmailColorState((text.length === 0) ? 'rgba(0, 0, 0, 0.3)' : '#000');
+    setEmail(text);
+  }
+
+  const handlePasswordChange = text => {
+    setPasswordColorState((text.length === 0) ? 'rgba(0, 0, 0, 0.3)' : '#000');
+    setPassword(text);
+  }
+
   return (
     <View style={styles.loginBg}>
       <View style={styles.svgContainer}>
@@ -20,6 +38,25 @@ export default LandingPage = () => {
         <Text style={{fontFamily: 'Roboto-Medium', fontSize: 18, color: 'white', opacity: 0.6, marginHorizontal: 23, marginBottom: 65}}>Timex allows you to optimize your time, so you can truly focus on your hobbies and passions.</Text>
         <Btn text='Log In' textColor='black' btnColor='white'/>
         <Btn text='Sign Up' textColor='white' btnColor='black' borderColor='white'/>
+        <KeyboardAvoidingView style={styles.formInputContainer} behavior="height">
+          <View style={[styles.TextInput, {marginBottom: 27, borderBottomColor: emailColorState}]}>
+            <AntDesign name="mail" size={18} color={emailColorState} />
+            <Field placeholder="email" keyboardType="email-address" value={email} onChangeText={text => handleMailChange(text)} />
+            <AntDesign name="checksquareo" size={18} color={emailColorState} />
+          </View>
+          <View style={[styles.TextInput, {borderBottomColor: passwordColorState}]}>
+            <AntDesign name="lock" size={18} color={passwordColorState} />
+            <Field placeholder="password" secureTextEntry={(passwordVisibility === 'eye-off') ? true : false} value={password} onChangeText={text => handlePasswordChange(text)} />
+            <TouchableOpacity onPress={() => {
+              setPasswordVisibility((passwordVisibility === 'eye-off') ? 'eye' : 'eye-off');
+            }}>
+              <Feather name={passwordVisibility} size={18} color={passwordColorState} />
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity style={styles.forgetPwd}>
+            <Text style={{textAlign: 'right', fontFamily: 'Roboto-Medium', fontSize: 14}}>forget password ?</Text>
+          </TouchableOpacity>
+        </KeyboardAvoidingView>
       </SafeAreaView>
     </View>
   )

@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View } from 'react-native';
+import { WINDOW_HEIGHT } from './constants';
 
 export const styles = StyleSheet.create({
     container: {
@@ -24,5 +25,30 @@ export const styles = StyleSheet.create({
         flex: 1,
         paddingBottom: 20,
     },
+    formInputContainer: {
+        position: 'absolute',
+        bottom: 0,
+        backgroundColor: 'white',
+        height: WINDOW_HEIGHT / 2,
+        zIndex: 10,
+        width: '100%',
+    },
+    field: {
+        paddingVertical: 7,
+        width: '80%',
+    },
+    TextInput: {
+        flexDirection: 'row',
+        borderBottomWidth: 1.7,
+        width: '88%',
+        alignSelf: 'center',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+    },
+    forgetPwd: {
+        width: '88%',
+        marginTop: 15,
+        alignSelf: 'center',
+    }
 });
   
