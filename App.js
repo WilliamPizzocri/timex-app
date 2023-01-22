@@ -1,7 +1,12 @@
 import { StyleSheet, Text, View } from 'react-native';
-import LandingPage from './screens/LandingPage';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useFonts } from 'expo-font';
 import { styles } from './style';
+import LandingPage from './screens/LandingPage';
+import HomePage from './screens/HomePage';
+
+const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [fontsLoaded] = useFonts({
@@ -12,8 +17,11 @@ export default function App() {
   if (!fontsLoaded) return undefined;
 
   return (
-    <View style={styles.container}>
-      <LandingPage />
-    </View>
+    <NavigationContainer>
+      <Stack.Navigator>
+        <Stack.Screen options={{headerShown: false}} name="Login" component={LandingPage} />
+        <Stack.Screen options={{headerShown: false}} name="Home" component={HomePage} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 };

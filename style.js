@@ -29,9 +29,9 @@ export const styles = StyleSheet.create({
         position: 'absolute',
         bottom: 0,
         backgroundColor: 'white',
-        height: WINDOW_HEIGHT / 2,
         zIndex: 10,
         width: '100%',
+        paddingBottom: 10,
     },
     field: {
         paddingVertical: 7,
