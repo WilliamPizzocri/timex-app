@@ -32,6 +32,9 @@ export const styles = StyleSheet.create({
         zIndex: 10,
         width: '100%',
         paddingBottom: 10,
+        borderTopEndRadius: 40,
+        borderTopLeftRadius: 40,
+        paddingTop: 20,
     },
     field: {
         paddingVertical: 7,

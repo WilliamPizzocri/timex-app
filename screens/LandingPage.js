@@ -6,10 +6,12 @@ import Animated, { useSharedValue, useAnimatedStyle, interpolate, withTiming } f
 import { styles } from '../style';
 import { Btn, BtnDivider, LogoBtn } from '../components/Btn';
 import Field from '../components/Field';
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged } from "firebase/auth";
+import { onAuthStateChanged } from "firebase/auth";
 import { WINDOW_HEIGHT, WINDOW_WIDTH } from '../constants';
 import { useNavigation } from '@react-navigation/core';
 import { auth } from '../firebase';
+import { handleSignUp, handleLogIn, handleGoogleSignUp } from '../functions/authentication';
+import { validateEmail, validatePassword } from '../functions/validation';
 
 export default LandingPage = () => {
   const [email, setEmail] = useState('');
@@ -23,6 +25,8 @@ export default LandingPage = () => {
   const [showNameField, setShowNameField] = useState(false);
   const [showLogComponents, setShowLogComponents] = useState(false);
   const [logText, setLogText] = useState('Welcome\nBack');
+  const [validEmail, setValidEmail] = useState('#fff');
+  const [validPassword, setValidPassword] = useState('rgba(0, 0, 0, 0.3)');
   const imagePosition = useSharedValue(1);
   const navigation = useNavigation();
 
@@ -63,13 +67,27 @@ export default LandingPage = () => {
     }
   })
 
+  const stateSignUpHandler = () => {
+    handleSignUp(auth, email, password, name);
+  }
+
+  const stateLoginHandler = () => {
+    handleLogIn(auth, email, password);
+  }
+
+  const StateHandleGoogleSignUp = () => {
+    handleGoogleSignUp(auth);
+  }
+
   const handleMailChange = text => {
     setEmailColorState((text.length === 0) ? 'rgba(0, 0, 0, 0.3)' : '#000');
+    validateEmail(text) ? setValidEmail('#008000') : setValidEmail('rgba(0, 0, 0, 0.3)');
     setEmail(text);
   }
 
   const handlePasswordChange = text => {
     setPasswordColorState((text.length === 0) ? 'rgba(0, 0, 0, 0.3)' : '#000');
+    validatePassword(text) ? setValidPassword('#008000') : setValidPassword('rgba(0, 0, 0, 0.3)');
     setPassword(text);
   }
 
@@ -78,29 +96,8 @@ export default LandingPage = () => {
     setName(text);
   }
 
-  const handleSignUp = () => {
-    createUserWithEmailAndPassword(auth, email, password)
-      .then(userCredentials => {
-        const user = userCredentials.user;
-        console.log(user);
-      })
-      .catch(error => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        console.log(errorMessage);
-      })
-  }
-
-  const handleLogIn = () => {
-    signInWithEmailAndPassword(auth, email, password)
-      .then((userCredential) => {
-        const user = userCredential.user;
-        console.log('Logged In with: ', user.email);
-      })
-      .catch((error) => {
-        const errorCode = error.code;
-        const errorMessage = error.message;
-      })
+  const handleForgetPassword = () => {
+    navigation.navigate('ForgetPassword');
   }
 
   useEffect(() => {
@@ -150,17 +147,21 @@ export default LandingPage = () => {
           {showNameField &&
             <View style={[styles.TextInput, {marginBottom: 27, borderBottomColor: nameColorState}]}>
               <AntDesign name="user" size={18} color={nameColorState} />
-              <Field placeholder="Name" keyboardType="email-address" value={name} onChangeText={text => handleNameChange(text)} />
+              <Field placeholder="Name" keyboardType="default" value={name} onChangeText={text => handleNameChange(text)} />
               <AntDesign name="check" size={18} color={'rgba(0, 0, 0, 0)'} />
             </View>
           }
           <View style={[styles.TextInput, {marginBottom: 27, borderBottomColor: emailColorState}]}>
             <AntDesign name="mail" size={18} color={emailColorState} />
             <Field placeholder="email" keyboardType="email-address" value={email} onChangeText={text => handleMailChange(text)} />
-            <AntDesign name="checksquareo" size={18} color={emailColorState} />
+            <AntDesign name="checksquareo" size={18} color={emailColorState} style={{
+                color: validEmail,
+            }}/>
           </View>
           <View style={[styles.TextInput, {borderBottomColor: passwordColorState}]}>
-            <AntDesign name="lock" size={18} color={passwordColorState} />
+            <AntDesign name="lock" size={18} color={passwordColorState} style={{
+                color: validPassword,
+            }}/>
             <Field placeholder="password" secureTextEntry={(passwordVisibility === 'eye-off') ? true : false} value={password} onChangeText={text => handlePasswordChange(text)} />
             <TouchableOpacity onPress={() => {
               setPasswordVisibility((passwordVisibility === 'eye-off') ? 'eye' : 'eye-off');
@@ -168,13 +169,13 @@ export default LandingPage = () => {
               <Feather name={passwordVisibility} size={18} color={passwordColorState} />
             </TouchableOpacity>
           </View>
-          <TouchableOpacity style={styles.forgetPwd}>
+          <TouchableOpacity style={styles.forgetPwd} onPress={handleForgetPassword}>
             <Text style={{textAlign: 'right', fontFamily: 'Roboto-Medium', fontSize: 14, marginBottom: 25}}>forget password ?</Text>
           </TouchableOpacity>
-          <LogoBtn text='Log in with Google' textColor='black' btnColor='white' borderColor='black'/>
+          <LogoBtn text='Log in with Google' textColor='black' btnColor='white' borderColor='black' press={StateHandleGoogleSignUp}/>
           {sigInBtn ?
-            <Btn text='Log In' textColor='white' btnColor='black' press={handleLogIn}/>
-            :  <Btn text='Sign Up' textColor='white' btnColor='black' press={handleSignUp}/>
+            <Btn text='Log In' textColor='white' btnColor='black' press={stateLoginHandler}/>
+            :  <Btn text='Sign Up' textColor='white' btnColor='black' press={stateSignUpHandler}/>
           }
           <BtnDivider text="or"/>
           {sigInBtn ?

@@ -1,9 +1,9 @@
 import { Text, TouchableOpacity, Image, View } from 'react-native'
 import React from 'react'
 
-export const Btn = ({text, textColor, btnColor, press, borderColor}) => {
+export const Btn = ({text, textColor, btnColor, press, borderColor, style}) => {
   return (
-    <TouchableOpacity onPress={press} style={{
+    <TouchableOpacity onPress={press} style={[{
         backgroundColor: btnColor,
         marginHorizontal: 23,
         borderRadius: 7,
@@ -14,7 +14,7 @@ export const Btn = ({text, textColor, btnColor, press, borderColor}) => {
         borderColor: borderColor,
         borderWidth: 1,
         marginVertical: 6,
-    }}>
+    }, style]}>
         <Text style={{
             color: textColor,
             fontFamily: 'Roboto-Medium',
