@@ -1,18 +1,64 @@
-import { View, Text, Button } from 'react-native';
+import { View, Text, Button, Platform, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { styles } from '../style';
 import TextInputHeader from '../components/TextInputHeader';
 import AddField from '../components/AddField';
-import DatePicker from 'react-native-date-picker';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import { AntDesign } from '@expo/vector-icons';
+import { Btn } from '../components/Btn';
+import { ScrollView } from 'react-native-gesture-handler';
 
 
 const AddPage = () => {
 
   const [jobName, setJobName] = useState('');
   const [address, setAddress] = useState('');
-  const [date, setDate] = useState(new Date())
-  const [open, setOpen] = useState(false)
+  const [payment, setPayment] = useState('');
+  const [description, setDescription] = useState('');
+  const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+  const [isTimePickerVisible, setTimePickerVisibility] = useState(false);
+  const [date, setDate] = useState(new Date());
+  const [time, setTime] = useState(new Date());
+  const [dateText, setDateText] = useState('');
+  const [timeText, setTimeText] = useState('');
+
+  const showDatePicker = () => {
+    setDatePickerVisibility(true);
+  };
+
+  const hideDatePicker = () => {
+    setDatePickerVisibility(false);
+  };
+
+  const handleDateConfirm = (date) => {
+    const dt = new Date(date);
+    setDate(dt);
+    const tdt = (dt.toISOString().split('T'))[0].split('-')
+    setDateText(tdt[2] + '/' + tdt[1] + '/' + tdt[0]);
+    hideDatePicker();
+  };
+
+  const showTimePicker = () => {
+    setTimePickerVisibility(true);
+  };
+
+  const hideTImePicker = () => {
+    setTimePickerVisibility(false);
+  };
+
+  const handleTimeConfirm = (date) => {
+    const dt = new Date(date);
+    setTime(dt);
+    const tdt = dt.toLocaleTimeString().split(':');
+    setTimeText(tdt[0] + ':' + tdt[1]);
+    hideTImePicker();
+  };
+
+  const handlePaymentChange = (text) => {
+    const n = parseInt(text);
+    (n < 1) ? setPayment(1) : setPayment(n);
+  }
 
   return (
     <View style={styles.container}>
@@ -33,8 +79,7 @@ const AddPage = () => {
           <Path fill-rule="evenodd" clip-rule="evenodd" d="M127.913 41.8373C126.598 27.5017 118.437 15.442 106.953 8.58972L110.658 8.24975L110.633 7.97685C121.507 15.4151 129.105 27.4647 130.403 41.6088C132.714 66.7979 114.168 89.0915 88.9794 91.4029C72.8867 92.8797 57.9758 85.8432 48.7024 74.0001H51.9361C60.7597 84.2613 74.2477 90.2443 88.751 88.9134C112.565 86.7281 130.099 65.6514 127.913 41.8373ZM41.6984 50.0001C41.6904 49.9171 41.6825 49.8341 41.6749 49.751C39.4896 25.9369 57.0232 4.86018 80.8373 2.67488C85.3557 2.26024 89.7755 2.55549 93.9865 3.46883L93.7476 0.865149C89.5258 0.0256595 85.1136 -0.228045 80.6088 0.185335C55.4198 2.49681 36.8739 24.7904 39.1853 49.9794C39.186 49.9863 39.1866 49.9932 39.1872 50.0001H41.6984Z" fill="#2D2D2D"/>
         </Svg>
       </View>
-      <Text style={styles.AddTitle}>Aggiungi richiesta</Text>
-      <View style={styles.AddContainer}>
+      <ScrollView style={styles.AddContainer}>
         <Text style={{fontFamily: 'Roboto-Medium', fontSize: 30, color: '#696E75', marginBottom: 13}}>Aggiungi richiesta</Text>
         <Text style={{fontFamily: 'Roboto-Regular', fontSize: 14, color: '#696E75'}}>Compila il form per pubblicare la tua{"\n"}richiesta!</Text>
         <TextInputHeader text="Lavoro da svolgere" />
@@ -42,20 +87,34 @@ const AddPage = () => {
         <TextInputHeader text="Luogo del lavoro" />
         <AddField placeholder="Inserisci l'indirizzo" keyboardType="default" value={address} onChangeText={text => setAddress(text)}/>
         <TextInputHeader text="Inserisci data e ora" />
-        <Button title="Open" onPress={() => setOpen(true)} />
-        <DatePicker
-          modal
-          open={open}
-          date={date}
-          onConfirm={(date) => {
-            setOpen(false)
-            setDate(date)
-          }}
-          onCancel={() => {
-            setOpen(false)
-          }}
-        />
-      </View>
+        <View style={styles.TimeDateContainer}>
+          <TouchableOpacity style={[styles.TimeDataLabel, {marginRight: 2}]} onPress={showDatePicker}>
+            <Text style={{flex: 1}}>{dateText}</Text>
+            <AntDesign name="calendar" size={20} color="black" />
+          </TouchableOpacity>
+          <TouchableOpacity style={[styles.TimeDataLabel, {marginLeft: 2}]} onPress={showTimePicker}>
+            <Text style={{flex: 1}}>{timeText}</Text>
+            <AntDesign name="clockcircleo" size={20} color="black" />
+          </TouchableOpacity>
+          <DateTimePickerModal
+            isVisible={isDatePickerVisible}
+            mode="date"
+            onConfirm={handleDateConfirm}
+            onCancel={hideDatePicker}
+          />
+          <DateTimePickerModal
+            isVisible={isTimePickerVisible}
+            mode="time"
+            onConfirm={handleTimeConfirm}
+            onCancel={hideTImePicker}
+          />
+        </View>
+        <TextInputHeader text="Offerta di pagamento" />
+        <AddField placeholder="Inserisci la tua offerta" keyboardType="numeric" value={payment} onChangeText={text => handlePaymentChange(text)}/>
+        <TextInputHeader text="Descrizione" />
+        <AddField placeholder="Descrizione" multiline={true} keyboardType="default" value={description} onChangeText={text =>setDescription(text)}/>
+        <Btn text='Aggiungi' textColor='white' btnColor='black' style={{width: '100%', alignSelf: 'center', marginTop: 20}}/>
+      </ScrollView>
     </View>
   )
 }

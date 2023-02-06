@@ -53,16 +53,8 @@ export const styles = StyleSheet.create({
         marginTop: 15,
         alignSelf: 'center',
     },
-    AddTitle: {
-        fontFamily: 'Roboto-Medium',
-        fontSize: 36,
-        color: '#3E4243',
-        position: 'absolute',
-        top: 33,
-    },
     AddContainer: {
         width: '90%',
-        height: '80%',
         shadowColor: "#171717",
         shadowOffset: {
         width: 0,
@@ -77,6 +69,7 @@ export const styles = StyleSheet.create({
         top: 50,
         paddingHorizontal: 20, 
         paddingTop: 15,
+        marginBottom: 70,
     },
     AddField: {
         paddingVertical: 4,
@@ -86,5 +79,18 @@ export const styles = StyleSheet.create({
         borderRadius: 5,
         marginTop: 5,
     },
+    TimeDataLabel: {
+        paddingVertical: 8,
+        paddingHorizontal: 10,
+        alignSelf: 'center',
+        marginTop: 5,
+        flexDirection: 'row',
+        backgroundColor: '#DFE2E5',
+        borderRadius: 5,
+        flex: 1,
+    },
+    TimeDateContainer: {
+        flexDirection: 'row',
+    }
 });
   
