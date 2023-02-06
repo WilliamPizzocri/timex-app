@@ -1,9 +1,19 @@
-import { View, Text } from 'react-native';
-import React from 'react';
+import { View, Text, Button } from 'react-native';
+import React, { useState } from 'react';
 import Svg, { Circle, Path, Rect } from 'react-native-svg';
 import { styles } from '../style';
+import TextInputHeader from '../components/TextInputHeader';
+import AddField from '../components/AddField';
+import DatePicker from 'react-native-date-picker';
+
 
 const AddPage = () => {
+
+  const [jobName, setJobName] = useState('');
+  const [address, setAddress] = useState('');
+  const [date, setDate] = useState(new Date())
+  const [open, setOpen] = useState(false)
+
   return (
     <View style={styles.container}>
       <View style={[styles.svgContainer, {
@@ -22,6 +32,29 @@ const AddPage = () => {
           <Path fill-rule="evenodd" clip-rule="evenodd" d="M116.246 -44.1195C129.721 -35.8529 139.265 -21.5553 140.821 -4.60194C143.44 23.9402 122.425 49.2014 93.8831 51.8206C65.341 54.4398 40.0797 33.425 37.4606 4.8829C34.8414 -23.6592 55.8561 -48.9205 84.3982 -51.5396C89.762 -52.0318 95.01 -51.6894 100.014 -50.6192L99.7747 -53.2217C94.7604 -54.2188 89.5201 -54.5201 84.1698 -54.0292C54.2527 -51.2838 32.2257 -24.8057 34.971 5.11136C37.7164 35.0284 64.1945 57.0555 94.1115 54.3101C124.029 51.5648 146.056 25.0867 143.31 -4.8304C141.769 -21.6294 132.744 -35.9407 119.83 -44.7752L119.859 -44.451L116.246 -44.1195Z" fill="#2D2D2D"/>
           <Path fill-rule="evenodd" clip-rule="evenodd" d="M127.913 41.8373C126.598 27.5017 118.437 15.442 106.953 8.58972L110.658 8.24975L110.633 7.97685C121.507 15.4151 129.105 27.4647 130.403 41.6088C132.714 66.7979 114.168 89.0915 88.9794 91.4029C72.8867 92.8797 57.9758 85.8432 48.7024 74.0001H51.9361C60.7597 84.2613 74.2477 90.2443 88.751 88.9134C112.565 86.7281 130.099 65.6514 127.913 41.8373ZM41.6984 50.0001C41.6904 49.9171 41.6825 49.8341 41.6749 49.751C39.4896 25.9369 57.0232 4.86018 80.8373 2.67488C85.3557 2.26024 89.7755 2.55549 93.9865 3.46883L93.7476 0.865149C89.5258 0.0256595 85.1136 -0.228045 80.6088 0.185335C55.4198 2.49681 36.8739 24.7904 39.1853 49.9794C39.186 49.9863 39.1866 49.9932 39.1872 50.0001H41.6984Z" fill="#2D2D2D"/>
         </Svg>
+      </View>
+      <Text style={styles.AddTitle}>Aggiungi richiesta</Text>
+      <View style={styles.AddContainer}>
+        <Text style={{fontFamily: 'Roboto-Medium', fontSize: 30, color: '#696E75', marginBottom: 13}}>Aggiungi richiesta</Text>
+        <Text style={{fontFamily: 'Roboto-Regular', fontSize: 14, color: '#696E75'}}>Compila il form per pubblicare la tua{"\n"}richiesta!</Text>
+        <TextInputHeader text="Lavoro da svolgere" />
+        <AddField placeholder="Inserisci il lavoro da svolgere" keyboardType="default" value={jobName} onChangeText={text => setJobName(text)}/>
+        <TextInputHeader text="Luogo del lavoro" />
+        <AddField placeholder="Inserisci l'indirizzo" keyboardType="default" value={address} onChangeText={text => setAddress(text)}/>
+        <TextInputHeader text="Inserisci data e ora" />
+        <Button title="Open" onPress={() => setOpen(true)} />
+        <DatePicker
+          modal
+          open={open}
+          date={date}
+          onConfirm={(date) => {
+            setOpen(false)
+            setDate(date)
+          }}
+          onCancel={() => {
+            setOpen(false)
+          }}
+        />
       </View>
     </View>
   )

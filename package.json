@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@expo/vector-icons": "^13.0.0",
+    "@react-native-community/datetimepicker": "6.5.2",
     "@react-navigation/bottom-tabs": "^6.5.4",
     "@react-navigation/native": "^6.1.2",
     "@react-navigation/native-stack": "^6.9.8",
@@ -20,6 +21,7 @@
     "firebase": "^9.16.0",
     "react": "18.1.0",
     "react-native": "0.70.5",
+    "react-native-date-picker": "^4.2.6",
     "react-native-gesture-handler": "~2.8.0",
     "react-native-joi-validation": "^0.0.5",
     "react-native-navigation-bar-color": "^2.0.2",

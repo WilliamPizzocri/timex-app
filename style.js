@@ -52,6 +52,39 @@ export const styles = StyleSheet.create({
         width: '88%',
         marginTop: 15,
         alignSelf: 'center',
-    }
+    },
+    AddTitle: {
+        fontFamily: 'Roboto-Medium',
+        fontSize: 36,
+        color: '#3E4243',
+        position: 'absolute',
+        top: 33,
+    },
+    AddContainer: {
+        width: '90%',
+        height: '80%',
+        shadowColor: "#171717",
+        shadowOffset: {
+        width: 0,
+        height: 3,
+        },
+        shadowOpacity:  0.17,
+        shadowRadius: 3.05,
+        elevation: 4,
+        backgroundColor: 'white',
+        borderRadius: 10,
+        position: 'relative',
+        top: 50,
+        paddingHorizontal: 20, 
+        paddingTop: 15,
+    },
+    AddField: {
+        paddingVertical: 4,
+        paddingHorizontal: 10,
+        width: '100%',
+        backgroundColor: '#DFE2E5',
+        borderRadius: 5,
+        marginTop: 5,
+    },
 });
   
