@@ -55,6 +55,7 @@ export const styles = StyleSheet.create({
     },
     AddContainer: {
         width: '90%',
+        height: '90%',
         shadowColor: "#171717",
         shadowOffset: {
         width: 0,
@@ -70,6 +71,7 @@ export const styles = StyleSheet.create({
         paddingHorizontal: 20, 
         paddingTop: 15,
         marginBottom: 70,
+        alignSelf: 'center',
     },
     AddField: {
         paddingVertical: 4,
