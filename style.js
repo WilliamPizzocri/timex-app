@@ -69,7 +69,7 @@ export const styles = StyleSheet.create({
         position: 'relative',
         top: 50,
         paddingHorizontal: 20, 
-        paddingTop: 15,
+        paddingVertical: 15,
         marginBottom: 70,
         alignSelf: 'center',
     },
@@ -93,6 +93,12 @@ export const styles = StyleSheet.create({
     },
     TimeDateContainer: {
         flexDirection: 'row',
+    },
+    selectItem: {
+        backgroundColor: '#DFE2E5',
+        paddingVertical: 10,
+        paddingHorizontal: 10,
+        elevation: 5,
     }
 });
   

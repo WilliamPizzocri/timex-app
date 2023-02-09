@@ -7,7 +7,7 @@ import {
   Keyboard,
   Pressable,
 } from "react-native";
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import Svg, { Circle, Path, Rect } from "react-native-svg";
 import { styles } from "../style";
 import TextInputHeader from "../components/TextInputHeader";
@@ -17,10 +17,9 @@ import { AntDesign } from "@expo/vector-icons";
 import { Btn } from "../components/Btn";
 import {
   FlatList,
-  ScrollView,
   TouchableWithoutFeedback,
 } from "react-native-gesture-handler";
-import { Picker } from "@react-native-picker/picker";
+import { writeUserTask } from '../functions/database';
 
 const AddPage = () => {
   //form states
@@ -37,17 +36,46 @@ const AddPage = () => {
 
   //route api state
   const [data, setData] = useState([]);
-  const [selectedAddress, setSelectedAddress] = useState();
+  const [selectedItem, setSelectedItem] = useState(null);
   const [isVisible, setIsVisible] = useState(false);
 
-  const pickerRef = useRef();
-
-  function open() {
-    pickerRef.current.focus();
+  const resetForm = () => {
+    setJobName('');
+    setAddress('');
+    setPayment('');
+    setDescription('');
+    setData(new Date());
+    setTime(new Date());
+    setDateText('');
+    setTimeText('');
+    setSelectedItem(null);
+    setData([]);
+    setIsVisible(false);
   }
 
-  function close() {
-    pickerRef.current.blur();
+  const saveTask = () => {
+    if (
+      jobName === "" ||
+      selectedItem == null ||
+      date == null ||
+      time == null ||
+      payment === '' ||
+      description === ""
+    ) {
+      alert('Si è verificato un errore nell\'inserimento!');
+      return;
+    }
+
+    const res = writeUserTask(jobName, selectedItem, date, time, payment, description);
+
+    console.log(res);
+
+    if (res) {
+      resetForm();
+      alert('Task inserito correttamente!');
+    } else {
+      alert('Si è verificato un errore nell\'inserimento!');
+    }
   }
 
   const showDatePicker = () => {
@@ -61,7 +89,6 @@ const AddPage = () => {
   const handleAddressChange = async (text) => {
     setAddress(text);
     if (text.length > 2) {
-      setIsVisible(true);
       const url = `https://api.openrouteservice.org/geocode/autocomplete?api_key=${process.env.OPENROUTE_API_KEY}&text=${address}&size=5`;
 
       await fetch(url)
@@ -69,17 +96,16 @@ const AddPage = () => {
         .then((data) => setData(data.features))
         .catch((error) => console.error(error));
 
-      open();
+      setIsVisible(true);
     } else {
       setIsVisible(false);
     }
   };
 
   const handleAddressSelection = (item) => {
-    setSelectedAddress(item);
     setAddress(item.properties.label);
-
-    console.log(item);
+    setSelectedItem(item);
+    setIsVisible(false);
   };
 
   const handleDateConfirm = (date) => {
@@ -173,112 +199,174 @@ const AddPage = () => {
             />
           </Svg>
         </View>
-        <ScrollView style={[styles.AddContainer]}>
-          <Text
-            style={{
-              fontFamily: "Roboto-Medium",
-              fontSize: 30,
-              color: "#696E75",
-              marginBottom: 13,
-            }}
-          >
-            Aggiungi richiesta
-          </Text>
-          <Text
-            style={{
-              fontFamily: "Roboto-Regular",
-              fontSize: 14,
-              color: "#696E75",
-            }}
-          >
-            Compila il form per pubblicare la tua{"\n"}richiesta!
-          </Text>
-          <TextInputHeader text="Lavoro da svolgere" />
-          <AddField
-            placeholder="Inserisci il lavoro da svolgere"
-            keyboardType="default"
-            value={jobName}
-            onChangeText={(text) => setJobName(text)}
-          />
-          <TextInputHeader text="Luogo del lavoro" />
-          <View style={styles.addressContainer}>
-            <AddField
-              placeholder="Inserisci l'indirizzo"
-              keyboardType="default"
-              value={address}
-              onChangeText={(text) => handleAddressChange(text)}
-            />
-            {isVisible && (
-              <Picker
-                ref={pickerRef}
-                selectedValue={null}
-                mode='dropdown'
-                style={styles.addressPicker}
-                onValueChange={(itemValue, itemIndex) =>
-                  handleAddressSelection(itemValue)
-                }
-              >
-                {data.map((item) => (
-                  <Picker.Item
-                    key={item.properties.id}
-                    label={item.properties.label}
-                    value={item}
+        <FlatList
+          style={styles.AddContainer}
+          data={[
+            {
+              key: "Titolo della form",
+              component: (
+                <View>
+                  <Text
+                    style={{
+                      fontFamily: "Roboto-Medium",
+                      fontSize: 30,
+                      color: "#696E75",
+                      marginBottom: 13,
+                    }}
+                  >
+                    Aggiungi richiesta
+                  </Text>
+                </View>
+              ),
+            },
+            {
+              key: "Sottotitolo della form",
+              component: (
+                <View>
+                  <Text
+                    style={{
+                      fontFamily: "Roboto-Regular",
+                      fontSize: 14,
+                      color: "#696E75",
+                    }}
+                  >
+                    Compila il form per pubblicare la tua{"\n"}richiesta!
+                  </Text>
+                </View>
+              ),
+            },
+            {
+              key: "Lavoro da svolgere",
+              component: (
+                <View>
+                  <TextInputHeader text="Lavoro da svolgere" />
+                  <AddField
+                    placeholder="Inserisci il lavoro da svolgere"
+                    keyboardType="default"
+                    value={jobName}
+                    onChangeText={(text) => setJobName(text)}
                   />
-                ))}
-              </Picker>
-            )}
-          </View>
-          <TextInputHeader text="Inserisci data e ora" />
-          <View style={styles.TimeDateContainer}>
-            <TouchableOpacity
-              style={[styles.TimeDataLabel, { marginRight: 2 }]}
-              onPress={showDatePicker}
-            >
-              <Text style={{ flex: 1 }}>{dateText}</Text>
-              <AntDesign name="calendar" size={20} color="black" />
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={[styles.TimeDataLabel, { marginLeft: 2 }]}
-              onPress={showTimePicker}
-            >
-              <Text style={{ flex: 1 }}>{timeText}</Text>
-              <AntDesign name="clockcircleo" size={20} color="black" />
-            </TouchableOpacity>
-            <DateTimePickerModal
-              isVisible={isDatePickerVisible}
-              mode="date"
-              onConfirm={handleDateConfirm}
-              onCancel={hideDatePicker}
-            />
-            <DateTimePickerModal
-              isVisible={isTimePickerVisible}
-              mode="time"
-              onConfirm={handleTimeConfirm}
-              onCancel={hideTImePicker}
-            />
-          </View>
-          <TextInputHeader text="Offerta di pagamento" />
-          <AddField
-            placeholder="Inserisci la tua offerta"
-            keyboardType="numeric"
-            value={payment}
-            onChangeText={(text) => handlePaymentChange(text)}
-          />
-          <TextInputHeader text="Descrizione" />
-          <AddField
-            placeholder="Descrizione"
-            multiline={true}
-            keyboardType="default"
-            value={description}
-            onChangeText={(text) => setDescription(text)}
-          />
-          <Btn
-            text="Aggiungi"
-            textColor="white"
-            btnColor="black"
-            style={{ width: "100%", alignSelf: "center", marginTop: 20 }}
-          />
-        </ScrollView>
+                </View>
+              ),
+            },
+            {
+              key: "Luogo del lavoro",
+              component: (
+                <View>
+                  <TextInputHeader text="Luogo del lavoro" />
+                  <AddField
+                    placeholder="Inserisci l'indirizzo"
+                    keyboardType="default"
+                    value={address}
+                    onChangeText={(text) => handleAddressChange(text)}
+                  />
+                  {(data.length > 0 && isVisible) && (
+                    <FlatList
+                      data={data}
+                      renderItem={({ item, index }) => {
+                        return (
+                          <Pressable
+                            onPress={() => handleAddressSelection(item)}
+                          >
+                            <Text style={styles.selectItem}>{item.properties.label}</Text>
+                          </Pressable>
+                        );
+                      }}
+                      keyExtractor={(item) => item.properties.id}
+                    />
+                  )}
+                </View>
+              ),
+            },
+            {
+              key: "Data e ora",
+              component: (
+                <View>
+                  <TextInputHeader text="Inserisci data e ora" />
+                  <View style={styles.TimeDateContainer}>
+                    <TouchableOpacity
+                      style={[styles.TimeDataLabel, { marginRight: 2 }]}
+                      onPress={showDatePicker}
+                    >
+                      <Text style={{ flex: 1 }}>{dateText}</Text>
+                      <AntDesign name="calendar" size={20} color="black" />
+                    </TouchableOpacity>
+                    <TouchableOpacity
+                      style={[styles.TimeDataLabel, { marginLeft: 2 }]}
+                      onPress={showTimePicker}
+                    >
+                      <Text style={{ flex: 1 }}>{timeText}</Text>
+                      <AntDesign name="clockcircleo" size={20} color="black" />
+                    </TouchableOpacity>
+                    <DateTimePickerModal
+                      isVisible={isDatePickerVisible}
+                      mode="date"
+                      onConfirm={handleDateConfirm}
+                      onCancel={hideDatePicker}
+                    />
+                    <DateTimePickerModal
+                      isVisible={isTimePickerVisible}
+                      mode="time"
+                      onConfirm={handleTimeConfirm}
+                      onCancel={hideTImePicker}
+                    />
+                  </View>
+                </View>
+              ),
+            },
+            {
+              key: "Offerta di pagamento",
+              component: (
+                <View>
+                  <TextInputHeader text="Offerta di pagamento" />
+                  <AddField
+                    placeholder="Inserisci la tua offerta"
+                    keyboardType="numeric"
+                    value={payment}
+                    onChangeText={(text) => handlePaymentChange(text)}
+                  />
+                </View>
+              ),
+            },
+            {
+              key: "Descrizione",
+              component: (
+                <View>
+                  <TextInputHeader text="Descrizione" />
+                  <AddField
+                    placeholder="Inserisci una descrizione (opzionale)"
+                    keyboardType="default"
+                    value={description}
+                    onChangeText={(text) => setDescription(text)}
+                  />
+                </View>
+              ),
+            },
+            {
+              key: "Bottone",
+              component: (
+                <View>
+                  <Btn
+                    text="Aggiungi"
+                    textColor="white"
+                    btnColor="black"
+                    style={{
+                      width: "100%",
+                      alignSelf: "center",
+                      marginTop: 20,
+                      marginBottom: 25,
+                    }}
+                    press={saveTask}
+                  />
+                </View>
+              ),
+            },
+          ]}
+          renderItem={({ item }) => (
+            <View style={styles.listItem}>{item.component}</View>
+          )}
+          keyExtractor={(item) => item.key}
+        />
       </View>
     </TouchableWithoutFeedback>
   );
