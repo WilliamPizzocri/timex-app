@@ -16,9 +16,13 @@ const handleSignUp = (auth, email, password, name) => {
     .then(async (userCredentials) => {
       const user = userCredentials.user;
       console.log(user);
+      
       await setDoc(doc(db, 'users', auth.currentUser.uid), {
         name: name,
+        balance: 500,
+        imageIcon: 'user.png',
       });
+
       sendEmailVerification(auth.currentUser)
       .then(() => {
         alert('Email verification sent, verify your account.');

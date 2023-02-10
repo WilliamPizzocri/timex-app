@@ -53,7 +53,7 @@ const AddPage = () => {
     setIsVisible(false);
   }
 
-  const saveTask = () => {
+  const saveTask = async () => {
     if (
       jobName === "" ||
       selectedItem == null ||
@@ -66,7 +66,7 @@ const AddPage = () => {
       return;
     }
 
-    const res = writeUserTask(jobName, selectedItem, date, time, payment, description);
+    const res = await writeUserTask(jobName, selectedItem, date, time, payment, description);
 
     console.log(res);
 

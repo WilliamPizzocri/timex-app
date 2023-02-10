@@ -1,5 +1,5 @@
-import { StyleSheet, Text, View } from 'react-native';
-import { WINDOW_HEIGHT } from './constants';
+import { Platform, StyleSheet, Text, View } from 'react-native';
+import { BOTTOM_SHEET_MAX_HEIGHT, BOTTOM_SHEET_MIN_HEIGHT, WINDOW_HEIGHT } from './constants';
 
 export const styles = StyleSheet.create({
     container: {
@@ -99,6 +99,40 @@ export const styles = StyleSheet.create({
         paddingVertical: 10,
         paddingHorizontal: 10,
         elevation: 5,
+    },
+    bottomSheet: {
+        position: 'absolute',
+        width: '100%',
+        height: BOTTOM_SHEET_MAX_HEIGHT,
+        bottom: BOTTOM_SHEET_MIN_HEIGHT - BOTTOM_SHEET_MAX_HEIGHT,
+        backgroundColor: 'white',
+        borderTopLeftRadius: 50,
+        borderTopRightRadius: 50,
+        ...Platform.select({
+            android: { elevation: 3 },
+            ios: {
+                shadowColor: '#a8bed',
+                shadowOpacity: 1,
+                shadowRadius: 6,
+                shadowOffset: {
+                    width: 2,
+                    height: 2,
+                },
+            },
+        }),      
+    },
+    draggableArea: {
+        width: 132,
+        height: 32,
+        alignSelf: 'center',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    dragHandle: {
+        width: 100,
+        height: 6,
+        backgroundColor: '#d3d3d3',
+        borderRadius: 10,
     }
 });
   
