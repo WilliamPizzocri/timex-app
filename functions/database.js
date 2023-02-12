@@ -1,8 +1,11 @@
-import { auth, db, geocollection } from "../firebase";
+import { auth, db, geocollection, geoFire } from "../firebase";
 import {
+  addDoc,
+  collection,
   doc,
   GeoPoint,
   getDoc,
+  setDoc,
   updateDoc,
 } from "firebase/firestore";
 
@@ -28,7 +31,7 @@ const writeUserTask = async (
     return false;
   }
 
-  geocollection.add({
+  const taskRef = await addDoc(collection(db, 'tasks'), {
     userId: auth.currentUser.uid,
     completedById: "",
     jobName: jobName,
@@ -36,10 +39,17 @@ const writeUserTask = async (
     time: time.getTime(),
     payment: parseInt(payment),
     description: description,
-    coordinates: new GeoPoint(
-      place.geometry.coordinates[0],
-      place.geometry.coordinates[1]
-    ),
+  });
+
+  await setDoc(doc(db, `users/${auth.currentUser.uid}/taskLIst`, taskRef.id), {
+    accepted: false,
+    completed: false,
+  });
+
+  geoFire.set(taskRef.id, [place.geometry.coordinates[0], place.geometry.coordinates[1]]).then(function() {
+    console.log("Provided key has been added to GeoFire");
+  }, function(error) {
+    console.log("Error: " + error);
   });
 
   return true;
@@ -54,15 +64,13 @@ const queryNearTasks = async (latitude, longitude, radius) => {
     return;
   }
 
-  const query = geocollection.near({
-    center: new GeoPoint(coordinates[0], coordinates[1]),
-    radius: radius,
+  let geoQuery = geoFire.query({
+    center: [-50.83, 100.19],
+    radius: 5
   });
 
-  // Get query (as Promise)
-  query.get().then((value) => {
-    // All GeoDocument returned by GeoQuery, like the GeoDocument added above
-    console.log(value.docs);
+  let onKeyEnteredRegistration = geoQuery.on("key_entered", function(key, location, distance) {
+    console.log(key + " entered query at " + location + " (" + distance + " km from center)");
   });
 };
 
