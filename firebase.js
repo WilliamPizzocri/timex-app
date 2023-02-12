@@ -1,8 +1,8 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getDatabase } from "firebase/database";
 import { getStorage } from "firebase/storage";
+import * as geoFirestore from 'geofirestore-js-main';
 
 const firebaseConfig = {
   apiKey: "AIzaSyADNi7kV4W5Vp-ey33pXVxfB85gIgeMYrc",
@@ -21,8 +21,10 @@ const db = getFirestore(app);
 
 const provider = new GoogleAuthProvider();
 
-const rtdb = getDatabase(app);
-
 const storage = getStorage(app);
 
-export { auth, db, rtdb, provider, storage };
+const GeoFirestore = geoFirestore.initializeApp(db);
+
+const geocollection = GeoFirestore.collection('tasks');
+
+export { auth, db, provider, storage, geocollection };

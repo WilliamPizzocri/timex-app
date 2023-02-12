@@ -1,7 +1,10 @@
-import { rtdb, auth, db } from "../firebase";
-import { push, ref, set, update } from "firebase/database";
-import { GeoFire } from "geofire";
-import { doc, getDoc, setDoc, updateDoc } from "firebase/firestore";
+import { auth, db, geocollection } from "../firebase";
+import {
+  doc,
+  GeoPoint,
+  getDoc,
+  updateDoc,
+} from "firebase/firestore";
 
 const writeUserTask = async (
   jobName,
@@ -13,11 +16,6 @@ const writeUserTask = async (
 ) => {
   const docRef = doc(db, "users", auth.currentUser.uid);
   const docSnap = await getDoc(docRef);
-  const taskRef = ref(rtdb, "tasks");
-  const newTaskRef = push(taskRef);
-  const newTaskId = newTaskRef.key;
-  const taskCoordinatesRef = ref(rtdb, `tasks/${newTaskId}`);
-  const geofire = new GeoFire(taskRef);
   let data = undefined;
 
   if (docSnap.exists()) {
@@ -30,21 +28,7 @@ const writeUserTask = async (
     return false;
   }
 
-  await geofire
-    .set(newTaskId, [
-      place.geometry.coordinates[0],
-      place.geometry.coordinates[1],
-    ])
-    .then(
-      () => {
-        console.log("Provided keys have been added to GeoFire");
-      },
-      (error) => {
-        console.log("Error: " + error);
-      }
-    );
-
-  await update(taskCoordinatesRef, {
+  geocollection.add({
     userId: auth.currentUser.uid,
     completedById: "",
     jobName: jobName,
@@ -52,32 +36,16 @@ const writeUserTask = async (
     time: time.getTime(),
     payment: parseInt(payment),
     description: description,
-  })
-    .then(() => {
-      console.log("Provided keys have been added to GeoFire");
-    })
-    .catch((error) => {
-      console.log(error);
-      return false;
-    });
-
-  const userRef = doc(
-    db,
-    "users",
-    `${auth.currentUser.uid}/tasksList/${newTaskId}`
-  );
-
-  await setDoc(userRef, {
-    accepted: false,
-    completed: false,
+    coordinates: new GeoPoint(
+      place.geometry.coordinates[0],
+      place.geometry.coordinates[1]
+    ),
   });
 
   return true;
 };
 
 const queryNearTasks = async (latitude, longitude, radius) => {
-  const firebaseRef = ref(rtdb, "tasks");
-  const geoFire = new GeoFire(firebaseRef);
   let coordinates = [];
 
   if (!isNaN(latitude) && !isNaN(longitude)) {
@@ -86,29 +54,16 @@ const queryNearTasks = async (latitude, longitude, radius) => {
     return;
   }
 
-  const query = geoFire.query({
-    center: coordinates,
+  const query = geocollection.near({
+    center: new GeoPoint(coordinates[0], coordinates[1]),
     radius: radius,
   });
 
-  var onKeyEnteredRegistration = await query.on(
-    "key_entered",
-    await function (key, location, distance) {
-      console.log(
-        key +
-          " entered query at " +
-          location +
-          " (" +
-          distance +
-          " km from center)"
-      );
-    }
-  );
-
-  return () => {
-    query.cancel();
-    onKeyEnteredRegistration.cancel();
-  };
+  // Get query (as Promise)
+  query.get().then((value) => {
+    // All GeoDocument returned by GeoQuery, like the GeoDocument added above
+    console.log(value.docs);
+  });
 };
 
 module.exports.queryNearTasks = queryNearTasks;
