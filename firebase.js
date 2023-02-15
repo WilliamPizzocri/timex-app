@@ -2,8 +2,6 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
 import { getStorage } from "firebase/storage";
-import { getDatabase, ref } from "firebase/database";
-import { GeoFire } from "geofire";
 
 const firebaseConfig = {
   apiKey: "AIzaSyADNi7kV4W5Vp-ey33pXVxfB85gIgeMYrc",
@@ -24,8 +22,4 @@ const provider = new GoogleAuthProvider();
 
 const storage = getStorage(app);
 
-const firebaseRef = ref(getDatabase(app));
-
-const geoFire = new GeoFire(firebaseRef);
-
-export { auth, db, provider, storage, geoFire };
+export { auth, db, provider, storage };

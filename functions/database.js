@@ -1,13 +1,18 @@
-import { auth, db, geocollection, geoFire } from "../firebase";
+import { auth, db } from "../firebase";
 import {
   addDoc,
   collection,
   doc,
   GeoPoint,
   getDoc,
+  getDocs,
+  query,
   setDoc,
   updateDoc,
+  where,
 } from "firebase/firestore";
+
+import { getBoundsOfDistance } from "geolib";
 
 const writeUserTask = async (
   jobName,
@@ -31,6 +36,8 @@ const writeUserTask = async (
     return false;
   }
 
+  const userLocation = new GeoPoint(place.geometry.coordinates[1], place.geometry.coordinates[0]);
+
   const taskRef = await addDoc(collection(db, 'tasks'), {
     userId: auth.currentUser.uid,
     completedById: "",
@@ -39,6 +46,7 @@ const writeUserTask = async (
     time: time.getTime(),
     payment: parseInt(payment),
     description: description,
+    location: userLocation,
   });
 
   await setDoc(doc(db, `users/${auth.currentUser.uid}/taskLIst`, taskRef.id), {
@@ -46,32 +54,52 @@ const writeUserTask = async (
     completed: false,
   });
 
-  geoFire.set(taskRef.id, [place.geometry.coordinates[0], place.geometry.coordinates[1]]).then(function() {
-    console.log("Provided key has been added to GeoFire");
-  }, function(error) {
-    console.log("Error: " + error);
-  });
-
   return true;
 };
 
 const queryNearTasks = async (latitude, longitude, radius) => {
-  let coordinates = [];
-
   if (!isNaN(latitude) && !isNaN(longitude)) {
-    coordinates = [latitude, longitude];
+    console.log('tutto ok!');
   } else {
     return;
   }
 
-  let geoQuery = geoFire.query({
-    center: [-50.83, 100.19],
-    radius: 5
+  const userRef = collection(db, 'tasks');
+  const center = {latitude: latitude, longitude: longitude};
+
+  const minSquare = getBoundsOfDistance(center, (radius * 1000))[0];
+  const maxSquare = getBoundsOfDistance(center, (radius * 1000))[1];
+
+  const minGeopoint = new GeoPoint(minSquare.latitude, minSquare.longitude);
+  const maxGeopoint = new GeoPoint(maxSquare.latitude, maxSquare.longitude);
+
+  const querySnapshot = await getDocs(query(userRef, 
+    where('location', '>', minGeopoint),
+    where('location', '<', maxGeopoint)
+  ));
+
+  const tasks = [];
+
+  querySnapshot.forEach((doc) => {
+    const task = doc.data();
+    if (task.userId != auth.currentUser.uid) {
+      tasks.push({
+        id: doc.id,
+        completedById: task.completedById,
+        date: new Date(task.date),
+        description: task.description,
+        jobName: task.jobName,
+        location: task.location,
+        payment: task.payment,
+        time: new Date(task.time),
+        userId: task.userId
+      });
+    }
   });
 
-  let onKeyEnteredRegistration = geoQuery.on("key_entered", function(key, location, distance) {
-    console.log(key + " entered query at " + location + " (" + distance + " km from center)");
-  });
+  console.log(tasks);
+
+  return tasks;
 };
 
 module.exports.queryNearTasks = queryNearTasks;
