@@ -133,6 +133,20 @@ export const styles = StyleSheet.create({
         height: 6,
         backgroundColor: '#d3d3d3',
         borderRadius: 10,
-    }
+    },
+    searchBar: {
+        fontFamily: 'Roboto-Regular', 
+        fontSize: 14,
+        flex: 1,
+    },
+    SearchBarInput: {
+        backgroundColor: '#DFE2E5',
+        borderRadius: 10,
+        width: '85%',
+        padding: 3,
+        alignSelf: 'center',
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
 });
   

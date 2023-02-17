@@ -1,4 +1,4 @@
-import { auth, db } from "../firebase";
+import { auth, db, storage } from "../firebase";
 import {
   addDoc,
   collection,
@@ -13,6 +13,7 @@ import {
 } from "firebase/firestore";
 
 import { getBoundsOfDistance } from "geolib";
+import { getBlob, getDownloadURL, ref } from "firebase/storage";
 
 const writeUserTask = async (
   jobName,
