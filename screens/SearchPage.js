@@ -6,16 +6,21 @@ import {
   Animated,
   Button,
   ActivityIndicator,
+  Modal,
+  Image,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { styles } from "../style";
 import { MAX_DOWNWORD_TRANSLATE_Y, MAX_UPWORD_TRANSLATE_Y } from "../constants";
-import { queryNearTasks } from "../functions/database";
+import { queryNearTasks, acceptTask } from "../functions/database";
 import MapScreen from "../components/MapScreen";
 import SearchBar from "../components/SearchBar";
 import { EvilIcons, FontAwesome } from "@expo/vector-icons";
 import TaskCard from "../components/TaskCard";
+import { getDataString, getTimeString } from "../functions/utilitys";
+import { TouchableWithoutFeedback } from "react-native-gesture-handler";
+import { Btn } from "../components/Btn";
 
 const SearchPage = () => {
   const [latitude, setLatitude] = useState(undefined);
@@ -24,8 +29,33 @@ const SearchPage = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
 
+  //task modal information
+  const [modalVisible, setModalVisible] = useState(false);
+  const [taskTitle, setTaskTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [date, setDate] = useState("");
+  const [time, setTime] = useState("");
+  const [location, setLocation] = useState("");
+  const [payment, setPayment] = useState("");
+  const [taskId, setTaskId] = useState('');
+  const [userId, setUserId] = useState('');
+
   const animatedValue = useRef(new Animated.Value(0)).current;
   const lastGestureDy = useRef(0);
+
+  const handleTaskPress = async (task) => {
+    setLatitude(task.location.latitude);
+    setLongitude(task.location.longitude);
+    setTaskTitle(task.jobName);
+    setDescription(task.description);
+    setDate(getDataString(task.date));
+    setTime(getTimeString(task.time));
+    setLocation(task.address);
+    setPayment(task.payment);
+    setTaskId(task.id);
+    setUserId(task.userId);
+    setModalVisible(true);
+  };
 
   const panResponder = useRef(
     PanResponder.create({
@@ -76,6 +106,16 @@ const SearchPage = () => {
     );
   }
 
+  const handleAcceptTask = () => {
+    const ris = acceptTask(taskId, userId);
+
+    if (ris) {
+      alert("Il task è stato accettato correttamente!");
+    } else {
+      alert("Errore nell'accettare i task!");
+    }
+  }
+
   return (
     <View>
       <MapScreen
@@ -110,8 +150,50 @@ const SearchPage = () => {
             }}
           />
         </View>
-        <TaskCard task={nearestTasks[0]}/>
+        {nearestTasks.map((task, index) => (
+          <TaskCard
+            key={index}
+            task={task}
+            onPress={() => handleTaskPress(task)}
+          />
+        ))}
       </Animated.View>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={() => {
+          console.log("Modale chiuso!");
+        }}
+      >
+        <TouchableWithoutFeedback style={styles.modalContaiener} onPress={() => setModalVisible(false)}>
+          <View style={styles.modalContent}>
+            <Image source={require('../assets/task.png')} style={{width: 270, height: 270}}/>
+            <Text style={{fontFamily: 'Roboto-Medium', fontSize: 26, marginBottom: 15}}>{taskTitle}</Text>
+            <Text style={{color: '#434343', fontFamily: 'Roboto-Regular', fontSize: 18, marginBottom: 10}}>{description}</Text>
+            <Text>
+              quando: {date} - {time}
+            </Text>
+            <Text>dove: {location}</Text>
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+              }}
+            >
+              <Text>pagamento: {payment}</Text>
+              <Image
+                source={require("../assets/currencyCoin.png")}
+                style={{ height: 17, width: 17, marginLeft: 3 }}
+              />
+            </View>
+            <View style={{flexDirection: 'row'}}>
+              <Btn text="Annulla" style={{flex: 1, marginHorizontal: 2, marginTop: 40}} press={() => setModalVisible(false)}/>
+              <Btn text="Accetta" style={{flex: 1, marginHorizontal: 2, marginTop: 40}} press={() => handleAcceptTask()} btnColor="#1A73E8" textColor="white" borderColor="#1A73E8"/>
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </Modal>
     </View>
   );
 };

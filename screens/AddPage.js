@@ -66,7 +66,7 @@ const AddPage = () => {
       return;
     }
 
-    const res = await writeUserTask(jobName, selectedItem, date, time, payment, description);
+    const res = await writeUserTask(jobName, selectedItem, address, date, time, payment, description);
 
     console.log(res);
 

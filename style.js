@@ -147,6 +147,45 @@ export const styles = StyleSheet.create({
         alignSelf: 'center',
         flexDirection: 'row',
         alignItems: 'center',
+        marginBottom: 10,
     },
+    avatarImage: { 
+        width: 60, 
+        height: 60, 
+        backgroundColor: '#556080', 
+        borderRadius: 10,
+    },
+    cardRow: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    cardContainer: {
+        width: '85%',
+        alignSelf: 'center',
+        backgroundColor: 'white',
+        borderRadius: 10,
+        elevation: 25,
+        padding: 13,
+        paddingBottom: 7,
+        marginTop: 10,
+    },
+    cardText: {
+        flex: 1,
+        marginLeft: 10,
+    },
+    modalContaiener: {
+        width: '100%',
+        height: '100%',
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'rgba(0, 0, 0, 0.4)',
+    },
+    modalContent: {
+        width: '85%',
+        backgroundColor: 'white',
+        padding: 30,
+        borderRadius: 15,
+        alignItems: 'center',
+    }
 });
   
