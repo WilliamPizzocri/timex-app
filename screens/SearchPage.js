@@ -8,6 +8,9 @@ import {
   ActivityIndicator,
   Modal,
   Image,
+  RefreshControl,
+  FlatList,
+  ScrollView,
 } from "react-native";
 import React, { useEffect, useRef, useState } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -28,6 +31,7 @@ const SearchPage = () => {
   const [nearestTasks, setNearestTasks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [refresh, setRefresh] = useState(false);
 
   //task modal information
   const [modalVisible, setModalVisible] = useState(false);
@@ -37,8 +41,8 @@ const SearchPage = () => {
   const [time, setTime] = useState("");
   const [location, setLocation] = useState("");
   const [payment, setPayment] = useState("");
-  const [taskId, setTaskId] = useState('');
-  const [userId, setUserId] = useState('');
+  const [taskId, setTaskId] = useState("");
+  const [userId, setUserId] = useState("");
 
   const animatedValue = useRef(new Animated.Value(0)).current;
   const lastGestureDy = useRef(0);
@@ -84,6 +88,15 @@ const SearchPage = () => {
     ],
   };
 
+  const refreshPage = async () => {
+    setLoading(true);
+    setRefresh(true);
+    const tasks = await queryNearTasks(latitude, longitude, 40);
+    setNearestTasks(tasks);
+    setRefresh(false);
+    setLoading(false);
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       const lat = parseFloat(await AsyncStorage.getItem("@geoLatitude"));
@@ -114,7 +127,7 @@ const SearchPage = () => {
     } else {
       alert("Errore nell'accettare i task!");
     }
-  }
+  };
 
   return (
     <View>
@@ -150,13 +163,23 @@ const SearchPage = () => {
             }}
           />
         </View>
-        {nearestTasks.map((task, index) => (
-          <TaskCard
-            key={index}
-            task={task}
-            onPress={() => handleTaskPress(task)}
-          />
-        ))}
+        <ScrollView
+          style={{ flex: 1 }}
+          refreshControl={
+            <RefreshControl
+              refreshing={refresh}
+              onRefresh={() => refreshPage()}
+            />
+          }
+        >
+          {nearestTasks.map((item, index) => (
+            <TaskCard
+              key={index}
+              task={item}
+              onPress={() => handleTaskPress(item)}
+            />
+          ))}
+        </ScrollView>
       </Animated.View>
       <Modal
         animationType="slide"
@@ -166,11 +189,34 @@ const SearchPage = () => {
           console.log("Modale chiuso!");
         }}
       >
-        <TouchableWithoutFeedback style={styles.modalContaiener} onPress={() => setModalVisible(false)}>
+        <TouchableWithoutFeedback
+          style={styles.modalContaiener}
+          onPress={() => setModalVisible(false)}
+        >
           <View style={styles.modalContent}>
-            <Image source={require('../assets/task.png')} style={{width: 270, height: 270}}/>
-            <Text style={{fontFamily: 'Roboto-Medium', fontSize: 26, marginBottom: 15}}>{taskTitle}</Text>
-            <Text style={{color: '#434343', fontFamily: 'Roboto-Regular', fontSize: 18, marginBottom: 10}}>{description}</Text>
+            <Image
+              source={require("../assets/task.png")}
+              style={{ width: 270, height: 270 }}
+            />
+            <Text
+              style={{
+                fontFamily: "Roboto-Medium",
+                fontSize: 26,
+                marginBottom: 15,
+              }}
+            >
+              {taskTitle}
+            </Text>
+            <Text
+              style={{
+                color: "#434343",
+                fontFamily: "Roboto-Regular",
+                fontSize: 18,
+                marginBottom: 10,
+              }}
+            >
+              {description}
+            </Text>
             <Text>
               quando: {date} - {time}
             </Text>
@@ -187,9 +233,20 @@ const SearchPage = () => {
                 style={{ height: 17, width: 17, marginLeft: 3 }}
               />
             </View>
-            <View style={{flexDirection: 'row'}}>
-              <Btn text="Annulla" style={{flex: 1, marginHorizontal: 2, marginTop: 40}} press={() => setModalVisible(false)}/>
-              <Btn text="Accetta" style={{flex: 1, marginHorizontal: 2, marginTop: 40}} press={() => handleAcceptTask()} btnColor="#1A73E8" textColor="white" borderColor="#1A73E8"/>
+            <View style={{ flexDirection: "row" }}>
+              <Btn
+                text="Annulla"
+                style={{ flex: 1, marginHorizontal: 2, marginTop: 40 }}
+                press={() => setModalVisible(false)}
+              />
+              <Btn
+                text="Accetta"
+                style={{ flex: 1, marginHorizontal: 2, marginTop: 40 }}
+                press={() => handleAcceptTask()}
+                btnColor="#1A73E8"
+                textColor="white"
+                borderColor="#1A73E8"
+              />
             </View>
           </View>
         </TouchableWithoutFeedback>

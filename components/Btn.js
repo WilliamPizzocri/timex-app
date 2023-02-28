@@ -24,6 +24,33 @@ export const Btn = ({text, textColor, btnColor, press, borderColor, style}) => {
   )
 }
 
+export const BurgerMenuBtn = ({color, press}) => {
+  return (
+    <TouchableOpacity onPress={press} style={{
+      height: 11,
+      width: 35,
+      marginTop: 37,
+      marginLeft: 30,
+      flexDirection: 'column',
+      alignItems: 'flex-start',
+      justifyContent: 'space-between',
+    }}>
+      <View style={{
+        backgroundColor: color,
+        height: 3.5,
+        width: 35,
+        margin: 4,
+      }}></View>
+      <View style={{
+        backgroundColor: color,
+        height: 3.5,
+        width: 27,
+        margin: 4,
+      }}></View>
+    </TouchableOpacity>
+  );
+}
+
 export const LogoBtn = ({text, textColor, btnColor, press, borderColor}) => {
   return (
     <TouchableOpacity onPress={press} style={{

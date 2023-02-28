@@ -17,6 +17,7 @@ export const styles = StyleSheet.create({
     svgContainer: {
         position: 'absolute',
         right: 0,
+        top: 0
     },
     landingTextCnt: {
         position: 'absolute',
@@ -186,6 +187,19 @@ export const styles = StyleSheet.create({
         padding: 30,
         borderRadius: 15,
         alignItems: 'center',
+    },
+    homeContainer: {
+        width: '100%',
+        height: '100%',
+    },
+    homeCardContainer: {
+        position: 'absolute',
+        bottom: 0,
+        backgroundColor: 'white',
+        height: '65%',
+        width: '100%',
+        borderTopLeftRadius: 50,
+        borderTopRightRadius: 50,
     }
 });
   

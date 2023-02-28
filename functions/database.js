@@ -141,7 +141,20 @@ const acceptTask = async (taskId, userId) => {
   return true;
 };
 
+const getUserData = async (uid) => {
+  const docRef = doc(db, 'users', uid);
+  const docSnap = await getDoc(docRef);
+
+  if (docSnap.exists()) {
+    return docSnap.data();
+  } 
+
+  console.log("No such document!");
+  return null;
+}
+
 module.exports.queryNearTasks = queryNearTasks;
 module.exports.writeUserTask = writeUserTask;
 module.exports.getUserAvatar = getUserAvatar;
 module.exports.acceptTask = acceptTask;
+module.exports.getUserData = getUserData;
