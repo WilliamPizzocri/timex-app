@@ -200,6 +200,12 @@ export const styles = StyleSheet.create({
         width: '100%',
         borderTopLeftRadius: 50,
         borderTopRightRadius: 50,
+    },
+    homeCardHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: 30,
+        marginTop: 40,
     }
 });
   

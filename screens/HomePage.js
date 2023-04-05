@@ -15,8 +15,9 @@ import { auth } from "../firebase";
 import { signOut } from "firebase/auth";
 import { useNavigation } from "@react-navigation/core";
 import { Svg, Circle, Path } from "react-native-svg";
-import { getUserAvatar, getUserData } from "../functions/database";
+import { getUserAvatar, getUserData, countConfirmedTasks } from "../functions/database";
 import { BurgerMenuBtn } from "../components/Btn";
+import { AntDesign } from '@expo/vector-icons';
 
 const HomePage = () => {
   const navigation = useNavigation();
@@ -26,6 +27,7 @@ const HomePage = () => {
   const [userBalance, setUserBalance] = useState(null);
   const [userName, setUserName] = useState(null);
   const [refresh, setRefresh] = useState(false);
+  const [confirmedCount, setConfirmedCount] = useState('0');
 
   useEffect(() => {
     async function fetchUserAvatar() {
@@ -35,6 +37,8 @@ const HomePage = () => {
       setUserName(userData.name);
       setUserAvatar(avatarUrl);
       setIsImageLoading(false);
+      const count = await countConfirmedTasks() || '0'; // gestione del valore null o undefined
+      setConfirmedCount(count);
     }
     fetchUserAvatar();
   }, []);
@@ -150,7 +154,15 @@ const HomePage = () => {
             marginTop: 15
           }}>{userName}</Text>
         </View>
-        <View style={styles.homeCardContainer}></View>
+        <View style={styles.homeCardContainer}>
+          <View style={styles.homeCardHeader}>
+            <Text style={{color: '#686868', opacity: 0.6, fontFamily: 'Roboto-Regular'}}>Prossimi lavori</Text>
+            <View style={{flexDirection: 'row', alignItems: 'center'}}>
+              <Text style={{color: '#686868', opacity: 0.6, fontFamily: 'Roboto-Regular', marginHorizontal: 5}}>{confirmedCount}</Text>
+              <AntDesign name="right" size={14} color="#686868" style={{opacity: 0.6}} />
+            </View>
+          </View>
+        </View>
       </SafeAreaView>
     </ScrollView>
   );

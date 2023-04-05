@@ -6,7 +6,8 @@ const getDataString = (dt) => {
 const getTimeString = (dt) => {
     const tdt = dt.toLocaleTimeString().split(":");
     return tdt[0] + ":" + tdt[1];
-  };
+};
+
 
 module.exports.getDataString = getDataString;
 module.exports.getTimeString = getTimeString;

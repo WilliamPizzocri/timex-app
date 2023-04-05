@@ -153,8 +153,20 @@ const getUserData = async (uid) => {
   return null;
 }
 
+const countConfirmedTasks = async () => {
+  const q = query(collection(db, `users/${auth.currentUser.uid}/taskLIst`), where('accepted', '==', true));
+  const querySnapshot = await getDocs(q);
+
+  if (!querySnapshot.empty) {
+    return querySnapshot.size.toString(); // converti il valore in stringa
+  } else {
+    return '0'; // restituisci una stringa "0" se la collezione è vuota
+  }
+}
+
 module.exports.queryNearTasks = queryNearTasks;
 module.exports.writeUserTask = writeUserTask;
 module.exports.getUserAvatar = getUserAvatar;
 module.exports.acceptTask = acceptTask;
 module.exports.getUserData = getUserData;
+module.exports.countConfirmedTasks = countConfirmedTasks;
