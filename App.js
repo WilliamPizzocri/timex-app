@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View, StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useFonts } from 'expo-font';
@@ -19,7 +19,7 @@ export default function App() {
 
   useEffect(() => {
     (async () => {
-      
+
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
         setErrorMsg('Permission to access location was denied');
@@ -34,7 +34,7 @@ export default function App() {
     })();
   }, []);
 
-  let text = 'Waiting..';
+  let text = 'Waiting...';
   if (errorMsg) {
     text = errorMsg;
   } else if (location) {
@@ -50,12 +50,15 @@ export default function App() {
   if (!fontsLoaded) return undefined;
 
   return (
-    <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen options={{headerShown: false}} name="Login" component={LandingPage} />
-        <Stack.Screen options={{headerShown: false}} name="Home" component={HomeRouter} />
-        <Stack.Screen options={{headerShown: false}} name="ForgetPassword" component={ForgetPassword} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <>
+      <StatusBar hidden={true} />
+      <NavigationContainer>
+        <Stack.Navigator>
+          <Stack.Screen options={{ headerShown: false }} name="Login" component={LandingPage} />
+          <Stack.Screen options={{ headerShown: false }} name="Home" component={HomeRouter} />
+          <Stack.Screen options={{ headerShown: false }} name="ForgetPassword" component={ForgetPassword} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </>
   );
 };

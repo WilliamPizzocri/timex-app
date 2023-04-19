@@ -147,10 +147,53 @@ const getUserData = async (uid) => {
 
   if (docSnap.exists()) {
     return docSnap.data();
-  } 
+  }
 
   console.log("No such document!");
   return null;
+}
+
+const getTasksData = async (querySnapshot) => {
+  let tasks = [];
+  let promises = [];
+
+  querySnapshot.forEach((snapshot) => {
+    const docRef = doc(db, `tasks/${snapshot.id}`);
+    const promise = getDoc(docRef).then((docSnap) => {
+      if (docSnap.exists()) {
+        task = docSnap.data();
+
+        tasks.push({
+          id: docSnap.id,
+          completedById: task.completedById,
+          date: new Date(task.date),
+          description: task.description,
+          jobName: task.jobName,
+          address: task.address,
+          location: task.location,
+          payment: task.payment,
+          time: new Date(task.time),
+          userId: task.userId,
+        });
+      }
+    });
+    promises.push(promise);
+  });
+
+  await Promise.all(promises);
+
+  tasks.sort((a, b) => {
+    const dateA = new Date(a.date);
+    const timeA = new Date(a.time);
+    const dateB = new Date(b.date);
+    const timeB = new Date(b.time);
+    const dateTimeA = new Date(dateA.getFullYear(), dateA.getMonth(), dateA.getDate(), timeA.getHours(), timeA.getMinutes(), timeA.getSeconds(), timeA.getMilliseconds());
+    const dateTimeB = new Date(dateB.getFullYear(), dateB.getMonth(), dateB.getDate(), timeB.getHours(), timeB.getMinutes(), timeB.getSeconds(), timeB.getMilliseconds());
+    return dateTimeB - dateTimeA;
+  });
+
+
+  return tasks;
 }
 
 const countConfirmedTasks = async () => {
@@ -158,11 +201,25 @@ const countConfirmedTasks = async () => {
   const querySnapshot = await getDocs(q);
 
   if (!querySnapshot.empty) {
-    return querySnapshot.size.toString(); // converti il valore in stringa
+    let dataSet = await getTasksData(querySnapshot);
+    return dataSet;
   } else {
-    return '0'; // restituisci una stringa "0" se la collezione è vuota
+    return []; // restituisci una stringa "0" se la collezione è vuota
   }
 }
+
+const countBookedTasks = async () => {
+  const q = query(collection(db, `users/${auth.currentUser.uid}/acceptedTasks`));
+  const querySnapshot = await getDocs(q);
+
+  if (!querySnapshot.empty) {
+    let dataSet = await getTasksData(querySnapshot);
+    return dataSet;
+  } else {
+    return []; // restituisci una stringa "0" se la collezione è vuota
+  }
+}
+
 
 module.exports.queryNearTasks = queryNearTasks;
 module.exports.writeUserTask = writeUserTask;
@@ -170,3 +227,4 @@ module.exports.getUserAvatar = getUserAvatar;
 module.exports.acceptTask = acceptTask;
 module.exports.getUserData = getUserData;
 module.exports.countConfirmedTasks = countConfirmedTasks;
+module.exports.countBookedTasks = countBookedTasks;

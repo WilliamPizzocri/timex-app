@@ -44,7 +44,7 @@ const AddPage = () => {
     setAddress('');
     setPayment('');
     setDescription('');
-    setData(new Date());
+    setDate(new Date());
     setTime(new Date());
     setDateText('');
     setTimeText('');
