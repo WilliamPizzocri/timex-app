@@ -1,5 +1,5 @@
 import { Platform, StyleSheet, Text, View } from 'react-native';
-import { BOTTOM_SHEET_MAX_HEIGHT, BOTTOM_SHEET_MIN_HEIGHT, WINDOW_HEIGHT } from './constants';
+import { BOTTOM_SHEET_MAX_HEIGHT, BOTTOM_SHEET_MIN_HEIGHT, WINDOW_HEIGHT, WINDOW_WIDTH } from './constants';
 
 export const styles = StyleSheet.create({
     container: {
@@ -206,6 +206,23 @@ export const styles = StyleSheet.create({
         justifyContent: 'space-between',
         paddingHorizontal: 30,
         marginTop: 40,
+    },
+    userWrapper: {
+        position: 'absolute',
+        zIndex: 100,
+        bottom: 240,
+        width: WINDOW_WIDTH,
+    },
+    userHeader: {
+        width: '85%',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignSelf: 'center',
+
+    },
+    userRank: {
+        display: 'flex',
+        flexDirection: 'row'
     }
 });
   
